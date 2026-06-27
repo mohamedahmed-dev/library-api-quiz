@@ -1,0 +1,942 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Library API",
+    "description": "REST API for managing authors, books, and loans in a library system.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authors",
+      "description": "Operations for managing authors"
+    },
+    {
+      "name": "Books",
+      "description": "Operations for managing books"
+    },
+    {
+      "name": "Loans",
+      "description": "Operations for managing book loans"
+    }
+  ],
+  "paths": {
+    "/authors": {
+      "get": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "List all authors",
+        "description": "Retrieve a list of all authors.",
+        "responses": {
+          "200": {
+            "description": "A list of authors.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Author"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Create a new author",
+        "description": "Add a new author to the library.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "bio": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "name": "Ursula K. Le Guin",
+                "bio": "American author of science fiction and fantasy."
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created author.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                },
+                "examples": {
+                  "created": {
+                    "value": {
+                      "id": 6,
+                      "name": "Ursula K. Le Guin",
+                      "bio": "American author of science fiction and fantasy."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/authors/{id}": {
+      "get": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Get author by ID",
+        "description": "Retrieve a single author by ID.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AuthorId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested author.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Author not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Update an author",
+        "description": "Update the name and/or bio of an existing author.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AuthorId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "bio": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "bio": "Updated biography."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated author.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                },
+                "examples": {
+                  "updated": {
+                    "value": {
+                      "id": 6,
+                      "name": "Ursula K. Le Guin",
+                      "bio": "Updated biography."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Author not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Delete an author",
+        "description": "Delete an author and their books from the system.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AuthorId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Author deleted successfully."
+          },
+          "404": {
+            "description": "Author not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/authors/{id}/books": {
+      "get": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "List books by author",
+        "description": "Retrieve all books written by a specific author.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AuthorId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Books written by the author.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Book"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Author not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/books": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "List all books",
+        "description": "Retrieve all books, optionally filtered by author ID.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AuthorIdQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of books with author information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookWithAuthor"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Create a new book",
+        "description": "Add a new book to the library.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "author_id"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "year": {
+                    "type": "integer"
+                  },
+                  "author_id": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "title": "The Left Hand of Darkness",
+                "year": 1969,
+                "author_id": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created book.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                },
+                "examples": {
+                  "created": {
+                    "value": {
+                      "id": 6,
+                      "title": "The Left Hand of Darkness",
+                      "year": 1969,
+                      "author_id": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Author not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/books/{id}": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Get book by ID",
+        "description": "Retrieve a single book with author details.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BookId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested book with author information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookWithAuthor"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Book not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Update a book",
+        "description": "Update the title, year, and/or author of an existing book.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BookId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "year": {
+                    "type": "integer"
+                  },
+                  "author_id": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "year": 1970
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated book.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                },
+                "examples": {
+                  "updated": {
+                    "value": {
+                      "id": 6,
+                      "title": "The Left Hand of Darkness",
+                      "year": 1970,
+                      "author_id": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Book or author not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Delete a book",
+        "description": "Remove a book from the library.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BookId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Book deleted successfully."
+          },
+          "404": {
+            "description": "Book not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loans": {
+      "get": {
+        "tags": [
+          "Loans"
+        ],
+        "summary": "List all loans",
+        "description": "Retrieve all loans, optionally filtered by return status.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LoanReturnedQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of loans.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Loan"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Loans"
+        ],
+        "summary": "Create a new loan",
+        "description": "Check out a book to a borrower.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "book_id",
+                  "borrower_name"
+                ],
+                "properties": {
+                  "book_id": {
+                    "type": "integer"
+                  },
+                  "borrower_name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "book_id": 5,
+                "borrower_name": "Carol White"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created loan.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Loan"
+                },
+                "examples": {
+                  "created": {
+                    "value": {
+                      "id": 4,
+                      "book_id": 5,
+                      "borrower_name": "Carol White",
+                      "loaned_at": "2026-06-27",
+                      "returned_at": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Book not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Book already loaned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loans/{id}": {
+      "get": {
+        "tags": [
+          "Loans"
+        ],
+        "summary": "Get loan by ID",
+        "description": "Retrieve a loan including associated book details.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LoanId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested loan with book details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanWithBook"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Loan not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loans/{id}/return": {
+      "patch": {
+        "tags": [
+          "Loans"
+        ],
+        "summary": "Return a loaned book",
+        "description": "Mark a loan as returned by setting the returned_at date.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LoanId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated loan with return date.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Loan"
+                },
+                "examples": {
+                  "returned": {
+                    "value": {
+                      "id": 4,
+                      "book_id": 5,
+                      "borrower_name": "Carol White",
+                      "loaned_at": "2026-06-27",
+                      "returned_at": "2026-06-30"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Loan not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Loan already returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "AuthorId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "Author identifier."
+      },
+      "BookId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "Book identifier."
+      },
+      "LoanId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "Loan identifier."
+      },
+      "AuthorIdQuery": {
+        "name": "author_id",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "Filter books by author ID.",
+        "examples": {
+          "orwell": {
+            "summary": "Filter books by George Orwell",
+            "value": 1
+          }
+        }
+      },
+      "LoanReturnedQuery": {
+        "name": "returned",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "boolean"
+        },
+        "description": "Filter loans by return status.",
+        "examples": {
+          "returned_true": {
+            "summary": "Only returned loans",
+            "value": true
+          },
+          "returned_false": {
+            "summary": "Only active loans",
+            "value": false
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Author": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "example": {
+          "id": 1,
+          "name": "George Orwell",
+          "bio": "English novelist best known for dystopian fiction."
+        }
+      },
+      "Book": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer",
+            "nullable": true
+          },
+          "author_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "author_id"
+        ],
+        "example": {
+          "id": 1,
+          "title": "1984",
+          "year": 1949,
+          "author_id": 1
+        }
+      },
+      "BookWithAuthor": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer",
+            "nullable": true
+          },
+          "author": {
+            "$ref": "#/components/schemas/Author"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "author"
+        ],
+        "example": {
+          "id": 1,
+          "title": "1984",
+          "year": 1949,
+          "author": {
+            "id": 1,
+            "name": "George Orwell",
+            "bio": "English novelist best known for dystopian fiction."
+          }
+        }
+      },
+      "Loan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "book_id": {
+            "type": "integer"
+          },
+          "borrower_name": {
+            "type": "string"
+          },
+          "loaned_at": {
+            "type": "string",
+            "format": "date"
+          },
+          "returned_at": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "book_id",
+          "borrower_name",
+          "loaned_at"
+        ],
+        "example": {
+          "id": 1,
+          "book_id": 1,
+          "borrower_name": "Alice Johnson",
+          "loaned_at": "2024-01-10",
+          "returned_at": null
+        }
+      },
+      "LoanWithBook": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "book": {
+            "$ref": "#/components/schemas/Book"
+          },
+          "borrower_name": {
+            "type": "string"
+          },
+          "loaned_at": {
+            "type": "string",
+            "format": "date"
+          },
+          "returned_at": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "book",
+          "borrower_name",
+          "loaned_at"
+        ],
+        "example": {
+          "id": 1,
+          "book": {
+            "id": 1,
+            "title": "1984",
+            "year": 1949,
+            "author_id": 1
+          },
+          "borrower_name": "Alice Johnson",
+          "loaned_at": "2024-01-10",
+          "returned_at": null
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "example": {
+          "error": "Book not found"
+        }
+      }
+    }
+  }
+}
